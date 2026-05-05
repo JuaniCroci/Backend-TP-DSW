@@ -3,6 +3,8 @@ import { Usuario} from './usuario.js'
 
 const app = express()
 
+app.use(express.json())
+
 const usuarios = [
   new Usuario(
     'Alpha',
@@ -14,7 +16,7 @@ const usuarios = [
 ]
 
 app.get('/api/usuarios', (req, res) => {
-  res.json(usuarios)
+  res.json({data: usuarios})
 
 })
 
@@ -23,7 +25,16 @@ app.get('/api/usuarios/:id', (req, res) => {
   if (!usuario) {
     res.status(404).send({message: 'Usuario no encontrado'})
   }
-  res.json(usuario)
+  res.json({data: usuario})
+})
+
+app.post('/api/usuarios', (req, res) => {
+  const { name, esAdmin, estaActivo} = req.body
+  const usuario = new Usuario (name, esAdmin, estaActivo )
+  usuarios.push(usuario)
+  res.status(201).send({message: 'Usuario creado', data: usuario})
+
+
 })
 
 app.listen(3000, () => {
