@@ -14,3 +14,14 @@ Content-Type: application/json
   "esAdmin": false,
   "estaActivo": true
 }
+
+### modificar un usuario (PUT o PATCH): el put debe ser idempotente, es decir, si se hace varias veces el resultado debe ser el mismo. El patch no es idempotente, ya que cada vez que se hace la petición se modifica el recurso.
+PUT http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
+Content-Type: application/json
+
+{
+  "name": "Ignacio",
+  "esAdmin": false,
+  "estaActivo": true
+}
+

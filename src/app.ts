@@ -37,6 +37,23 @@ app.post('/api/usuarios', (req, res) => {
 
 })
 
+app.put('/api/usuarios/:id', (req, res) => {
+  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
+
+  if (usuarioidx === -1) {
+    res.status(404).send({message: 'Usuario no encontrado'})
+  }
+  const input = {
+    name: req.body.name,
+    esAdmin: req.body.esAdmin,
+    estaActivo: req.body.estaActivo,
+  }
+  usuarios[usuarioidx] = {...usuarios[usuarioidx], ...input }
+
+  res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios
+    [usuarioidx]})
+})
+
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000' )
 }) 
