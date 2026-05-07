@@ -1,4 +1,4 @@
-import express from 'express'
+import express, {NextFunction, Request, Response } from 'express'
 import { Usuario} from './usuario.js'
 
 const app = express()
@@ -20,6 +20,18 @@ app.get('/api/usuarios', (req, res) => {
 
 })
 
+function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
+
+  req.body.sanitizedInput = {
+    name: req.body.name,
+    esAdmin: req.body.esAdmin,
+    estaActivo: req.body.estaActivo,
+  }
+
+  next() 
+
+}
+
 app.get('/api/usuarios/:id', (req, res) => {
   const usuario = usuarios.find((usuario) => usuario.id === req.params.id)
   if (!usuario) {
@@ -28,27 +40,23 @@ app.get('/api/usuarios/:id', (req, res) => {
   res.json({data: usuario})
 })
 
-app.post('/api/usuarios', (req, res) => {
-  const { name, esAdmin, estaActivo} = req.body
-  const usuario = new Usuario (name, esAdmin, estaActivo )
+app.post('/api/usuarios', sanitizeUsuarioInput, (req, res) => {
+  const input = req.body.sanitizedInput
+  const usuario = new Usuario (input.name, input.esAdmin, input.estaActivo )
   usuarios.push(usuario)
   res.status(201).send({message: 'Usuario creado', data: usuario})
 
 
 })
 
-app.put('/api/usuarios/:id', (req, res) => {
+app.put('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
   const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
 
   if (usuarioidx === -1) {
     res.status(404).send({message: 'Usuario no encontrado'})
   }
-  const input = {
-    name: req.body.name,
-    esAdmin: req.body.esAdmin,
-    estaActivo: req.body.estaActivo,
-  }
-  usuarios[usuarioidx] = {...usuarios[usuarioidx], ...input }
+ 
+  usuarios[usuarioidx] = {...usuarios[usuarioidx], ...req.body.sanitizedInput }
 
   res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios
     [usuarioidx]})
