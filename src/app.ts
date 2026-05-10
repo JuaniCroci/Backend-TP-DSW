@@ -86,9 +86,10 @@ app.delete('/api/usuarios/:id',(req, res) => {
 
   if (usuarioidx === -1) {
     res.status(404).send({message: 'Usuario no encontrado'})
-  }
-  usuarios.splice(usuarioidx, 1)
-  res.status(200).send({message: 'Usuario eliminado correctamente'})
+  } else {
+      usuarios.splice(usuarioidx, 1)
+      res.status(200).send({message: 'Usuario eliminado correctamente'})
+    }
 })
 
 app.listen(3000, () => {
