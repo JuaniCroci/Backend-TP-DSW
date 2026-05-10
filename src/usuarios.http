@@ -25,3 +25,12 @@ Content-Type: application/json
   "estaActivo": true
 }
 
+### modificar un usuario (PATCH - recurso parcial):
+PATCH  http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
+Content-Type: application/json
+
+{
+  "name": "Shifu",
+  "esAdmin": true,
+  "estaActivo": true
+}

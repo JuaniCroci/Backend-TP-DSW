@@ -27,6 +27,11 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
     esAdmin: req.body.esAdmin,
     estaActivo: req.body.estaActivo,
   }
+  Object.keys(req.body.sanitizedInput).forEach((key) => {
+    if (req.body.sanitizedInput[key] === undefined) {
+      delete req.body.sanitizedInput[key]
+    }
+  })
 
   next() 
 
@@ -50,6 +55,20 @@ app.post('/api/usuarios', sanitizeUsuarioInput, (req, res) => {
 })
 
 app.put('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
+  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
+
+  if (usuarioidx === -1) {
+    res.status(404).send({message: 'Usuario no encontrado'})
+  }
+ 
+  usuarios[usuarioidx] = {...usuarios[usuarioidx], ...req.body.sanitizedInput }
+
+  res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios
+    [usuarioidx]})
+})
+
+
+app.patch('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
   const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
 
   if (usuarioidx === -1) {
