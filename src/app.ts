@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { Usuario} from './usuario.js'
 
 const app = express()
@@ -79,6 +79,16 @@ app.patch('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
 
   res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios
     [usuarioidx]})
+})
+
+app.delete('/api/usuarios/:id',(req, res) => {
+  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
+
+  if (usuarioidx === -1) {
+    res.status(404).send({message: 'Usuario no encontrado'})
+  }
+  usuarios.splice(usuarioidx, 1)
+  res.status(200).send({message: 'Usuario eliminado correctamente'})
 })
 
 app.listen(3000, () => {

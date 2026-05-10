@@ -34,3 +34,8 @@ Content-Type: application/json
   "esAdmin": true,
   "estaActivo": true
 }
+
+### eliminar un usuario: (DELETE): para probar el delete, primero se debe crear un usuario nuevo,
+                              ###  luego se obtiene su id y se hace la petición delete con ese id. 
+
+DELETE http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
