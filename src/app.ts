@@ -83,15 +83,14 @@ app.patch('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
     [usuarioidx]})
 })
 
-app.delete('/api/usuarios/:id',(req, res) => {
+app.delete('/api/usuarios/:id', (req,res) => {
   const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
-
   if (usuarioidx === -1) {
     res.status(404).send({message: 'Usuario no encontrado'})
   } else {
-      usuarios.splice(usuarioidx, 1)
-      res.status(200).send({message: 'Usuario eliminado correctamente'})
-    }
+    usuarios.splice(usuarioidx, 1)
+    res.status(200).send({message: 'Usuario eliminado correctamente'})
+  }
 })
 
 app.listen(3000, () => {
