@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { Usuario} from './usuario.js'
 
 const app = express()
@@ -81,6 +81,7 @@ app.patch('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
     [usuarioidx]})
 })
 
+<<<<<<< HEAD
 app.delete('/api/usuarios/:id', (req,res) => {
   const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
   if (usuarioidx === -1) {
@@ -89,6 +90,17 @@ app.delete('/api/usuarios/:id', (req,res) => {
     usuarios.splice(usuarioidx, 1)
     res.status(200).send({message: 'Usuario eliminado correctamente'})
   }
+=======
+app.delete('/api/usuarios/:id',(req, res) => {
+  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
+
+  if (usuarioidx === -1) {
+    res.status(404).send({message: 'Usuario no encontrado'})
+  } else {
+      usuarios.splice(usuarioidx, 1)
+      res.status(200).send({message: 'Usuario eliminado correctamente'})
+    }
+>>>>>>> 8e6f3391cf3cd7b862c232c58e10f092f674fe9e
 })
 
 app.listen(3000, () => {
