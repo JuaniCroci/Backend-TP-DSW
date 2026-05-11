@@ -1,9 +1,12 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { Usuario} from './usuario/Usuario.entity.js'
+import { usuarioRepository } from './usuario/Usuario.repository.js'
 
 const app = express()
 
 app.use(express.json())
+
+const repository = new usuarioRepository()
 
 const usuarios = [
   new Usuario(
@@ -15,6 +18,10 @@ const usuarios = [
   ),
 ]
 
+app.get('/api/usuarios', (req, res) => {
+  res.json({data: repository.findAll()})
+
+})
 
 function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
 
@@ -33,62 +40,56 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
 
 }
 
-app.get('/api/usuarios', (req, res) => {
-  res.json({data: usuarios})
-
-})
-
-
 app.get('/api/usuarios/:id', (req, res) => {
-  const usuario = usuarios.find((usuario) => usuario.id === req.params.id)
+  const id = req.params.id
+  const usuario = repository.findONE({id})
   if (!usuario) {
-    res.status(404).send({message: 'Usuario no encontrado'})
+    return res.status(404).send({message: 'Usuario no encontrado'})
   }
   res.json({data: usuario})
 })
 
 app.post('/api/usuarios', sanitizeUsuarioInput, (req, res) => {
   const input = req.body.sanitizedInput
-  const usuario = new Usuario (input.name, input.esAdmin, input.estaActivo )
-  usuarios.push(usuario)
-  res.status(201).send({message: 'Usuario creado', data: usuario})
+
+  const usuarioInput = new Usuario (input.name, input.esAdmin, input.estaActivo )
+  const usuario = repository.add(usuarioInput)
+  return res.status(201).send({message: 'Usuario creado', data: usuario})
 
 
 })
 
 app.put('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
-  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
+  req.body.sanitizedInput.id = req.params.id
+  const usuario =repository.update(req.body.sanitizedInput)
 
-  if (usuarioidx === -1) {
-    res.status(404).send({message: 'Usuario no encontrado'})
+  if (!usuario) {
+    return res.status(404).send({message: 'Usuario no encontrado'})
   }
  
-  usuarios[usuarioidx] = {...usuarios[usuarioidx], ...req.body.sanitizedInput }
-
-  res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios
-    [usuarioidx]})
+  return res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios})
 })
 
 
 app.patch('/api/usuarios/:id', sanitizeUsuarioInput, (req, res) => {
-  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
+  
+  req.body.sanitizedInput.id = req.params.id
+  const usuario =repository.update(req.body.sanitizedInput)
 
-  if (usuarioidx === -1) {
-    res.status(404).send({message: 'Usuario no encontrado'})
+  if (!usuario) {
+    return res.status(404).send({message: 'Usuario no encontrado'})
   }
  
-  usuarios[usuarioidx] = {...usuarios[usuarioidx], ...req.body.sanitizedInput }
-
-  res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios
-    [usuarioidx]})
+  return res.status(200).send({message: 'Usuario actualizado correctamente', data: usuarios})
 })
 
 app.delete('/api/usuarios/:id', (req,res) => {
-  const usuarioidx = usuarios.findIndex((usuario) => usuario.id === req.params.id)
-  if (usuarioidx === -1) {
+  const id = req.params.id
+  const usuario =repository.delete({id})
+
+  if (!usuario) {
     res.status(404).send({message: 'Usuario no encontrado'})
   } else {
-    usuarios.splice(usuarioidx, 1)
     res.status(200).send({message: 'Usuario eliminado correctamente'})
   }
 })
