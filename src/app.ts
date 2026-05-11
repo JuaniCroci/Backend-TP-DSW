@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express'
-import { Usuario} from './usuario.js'
+import { Usuario} from './usuario/Usuario.entity.js'
 
 const app = express()
 
@@ -15,10 +15,6 @@ const usuarios = [
   ),
 ]
 
-app.get('/api/usuarios', (req, res) => {
-  res.json({data: usuarios})
-
-})
 
 function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
 
@@ -36,6 +32,12 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
   next() 
 
 }
+
+app.get('/api/usuarios', (req, res) => {
+  res.json({data: usuarios})
+
+})
+
 
 app.get('/api/usuarios/:id', (req, res) => {
   const usuario = usuarios.find((usuario) => usuario.id === req.params.id)
