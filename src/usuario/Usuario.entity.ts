@@ -4,7 +4,7 @@ export class Usuario {
     public name: string,
     public esAdmin: boolean,
     public estaActivo: boolean,
-    public id= crypto.randomUUID()
+    public id?: number
 
   ){}
 }

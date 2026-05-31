@@ -3,11 +3,9 @@
 
 //por ahora trabajamos en memoria sin promesas
 export interface Repository<T> {
-  findAll(): T[] | undefined
-  findONE(item: { id: string }): T | undefined
-  add(item: T): T | undefined
-  update(item: T): T | undefined
-  delete(item: { id: string }): T | undefined
-
-
+  findAll(): Promise<T[] | undefined>
+  findONE(item: { id: string }): Promise<T | undefined>
+  add(item: T): Promise<T | undefined>
+  update(id: string, item: T): Promise<T | undefined>
+  delete(item: { id: string }): Promise<T | undefined>
 }

@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express, { NextFunction, Request, Response } from 'express'
 import { Usuario} from './usuario/Usuario.entity.js'
 import { usuarioRepository } from './usuario/Usuario.repository.js'
