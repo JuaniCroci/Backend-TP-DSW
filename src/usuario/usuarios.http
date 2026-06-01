@@ -3,7 +3,7 @@ GET http://localhost:3000/api/usuarios
 
 ### pruebas para obtener UN usuario:
 
-GET http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
+GET http://localhost:3000/api/usuarios/1
 
 ### pruebas para crear un nuevo usuario:
 POST http://localhost:3000/api/usuarios
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### modificar un usuario (PUT o PATCH): el put debe ser idempotente, es decir, si se hace varias veces el resultado debe ser el mismo. El patch no es idempotente, ya que cada vez que se hace la petición se modifica el recurso.
-PUT http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
+PUT http://localhost:3000/api/usuarios/1
 Content-Type: application/json
 
 {
@@ -26,7 +26,7 @@ Content-Type: application/json
 }
 
 ### modificar un usuario (PATCH - recurso parcial):
-PATCH  http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
+PATCH  http://localhost:3000/api/usuarios/1
 Content-Type: application/json
 
 {
@@ -38,4 +38,4 @@ Content-Type: application/json
 ### eliminar un usuario: (DELETE): para probar el delete, primero se debe crear un usuario nuevo,
                               ###  luego se obtiene su id y se hace la petición delete con ese id. 
 
-DELETE http://localhost:3000/api/usuarios/cub45-328-777-0000-0000
+DELETE http://localhost:3000/api/usuarios/1

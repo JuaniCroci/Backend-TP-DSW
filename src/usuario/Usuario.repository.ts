@@ -1,6 +1,7 @@
 import {Repository} from "../shared/repository.js"
 import { Usuario } from "./Usuario.entity.js";
 import {pool} from '../shared/db/conn.mysql.js'
+import { RowDataPacket } from "mysql2/promise";
  
 export class usuarioRepository implements Repository<Usuario>{
   public async findAll(): Promise<Usuario[] | undefined> {
@@ -9,7 +10,19 @@ export class usuarioRepository implements Repository<Usuario>{
   }
 
   public async findONE(item: { id: string }): Promise<Usuario | undefined> {
-    throw new Error('not implemented')
+    const rawId = item.id
+    let params: any[]
+    if (typeof rawId === 'string' && /^\d+$/.test(rawId)) {
+      params = [Number.parseInt(rawId, 10)]
+    } else {
+      params = [rawId]
+    }
+    const [usuarios] = await pool.query<RowDataPacket[]>('SELECT * FROM usuarios WHERE id = ?', params)
+    if (usuarios.length === 0) {
+      return undefined
+    }
+    const usuario = usuarios[0] as Usuario
+    return usuario
   }
 
   public async add(item: Usuario): Promise<Usuario | undefined> {
