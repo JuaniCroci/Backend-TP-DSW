@@ -1,7 +1,7 @@
 import {Repository} from "../shared/repository.js"
 import { Usuario } from "./Usuario.entity.js";
 import {pool} from '../shared/db/conn.mysql.js'
-import { RowDataPacket } from "mysql2/promise";
+import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
  
 export class usuarioRepository implements Repository<Usuario>{
   public async findAll(): Promise<Usuario[] | undefined> {
@@ -25,8 +25,11 @@ export class usuarioRepository implements Repository<Usuario>{
     return usuario
   }
 
-  public async add(item: Usuario): Promise<Usuario | undefined> {
-    throw new Error ('not implemented')
+  public async add(usuarioInput: Usuario): Promise<Usuario | undefined> {
+    const {id, ...usuarioRow} = usuarioInput
+    const [result] = await pool.query<ResultSetHeader>('INSERT INTO usuarios set ?', [usuarioRow])
+    usuarioInput.id = result.insertId
+    return usuarioInput
   }
 
   public async update(id: string,item: Usuario): Promise<Usuario | undefined> {
