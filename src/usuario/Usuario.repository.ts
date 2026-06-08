@@ -35,13 +35,20 @@ export class usuarioRepository implements Repository<Usuario>{
   public async update(id: string,usuarioInput: Usuario): Promise<Usuario | undefined> {
     const usuarioId = Number.parseInt(id)
     await pool.query('update usuarios set ? where id = ?',[usuarioInput, Number.parseInt(id)] )
-    return usuarioInput
+    return await this.findONE({id})
 
   }
 
 
   public async delete(item: { id: string }): Promise<Usuario | undefined> {  
-    throw new Error('not implemented')
+    try {
+     const usuarioToDelete = await this.findONE(item)
+     const usuarioId = Number.parseInt(item.id)
+     await pool.query('delete from usuarios where id = ?',[usuarioId])
+     return usuarioToDelete;
+  }  catch (error: any) {
+     throw new Error('unable to delete usuario:')
+   }
   }
 
 }
