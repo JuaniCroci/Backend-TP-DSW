@@ -32,9 +32,14 @@ export class usuarioRepository implements Repository<Usuario>{
     return usuarioInput
   }
 
-  public async update(id: string,item: Usuario): Promise<Usuario | undefined> {
-    throw new Error('not implemented')
+  public async update(id: string,usuarioInput: Usuario): Promise<Usuario | undefined> {
+    const usuarioId = Number.parseInt(id)
+    await pool.query('update usuarios set ? where id = ?',[usuarioInput, Number.parseInt(id)] )
+    return usuarioInput
+
   }
+
+
   public async delete(item: { id: string }): Promise<Usuario | undefined> {  
     throw new Error('not implemented')
   }
