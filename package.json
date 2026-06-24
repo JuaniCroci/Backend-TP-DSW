@@ -6,7 +6,10 @@
   "main": "app.js",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\""
+    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\"",
+    "migration:create": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "migration:down": "mikro-orm migration:down"
   },
   "keywords": [],
   "author": "",
@@ -23,10 +26,17 @@
   },
   "dependencies": {
     "@mikro-orm/core": "^7.1.4",
+    "@mikro-orm/decorators": "^7.1.4",
     "@mikro-orm/migrations": "^7.1.4",
     "@mikro-orm/mysql": "^7.1.4",
     "dotenv": "^16.4.3",
     "express": "5.2.1",
     "mysql2": "3.22.3"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/mikro-orm.config.ts"
+    ]
   }
 }

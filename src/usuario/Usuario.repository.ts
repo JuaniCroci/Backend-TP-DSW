@@ -1,66 +1,35 @@
-import {Repository} from "../shared/repository.js"
-import { Usuario } from "./Usuario.entity.js";
-import {pool} from '../shared/db/conn.mysql.js'
-import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
- 
-export class usuarioRepository implements Repository<Usuario>{
-  public async findAll(): Promise<Usuario[] | undefined> {
-    const [usuarios] = await pool.query('SELECT * FROM usuarios')
-    return usuarios as Usuario[]
+import { EntityManager } from '@mikro-orm/mysql';
+import { Usuario } from './Usuario.entity.js';
+
+export class usuarioRepository {
+  constructor(private readonly em: EntityManager) {}
+
+  async findAll(): Promise<Usuario[]> {
+    return this.em.find(Usuario, {});
   }
 
-  public async findONE(item: { id: string }): Promise<Usuario | undefined> {
-    const rawId = item.id
-    let params: any[]
-    if (typeof rawId === 'string' && /^\d+$/.test(rawId)) {
-      params = [Number.parseInt(rawId, 10)]
-    } else {
-      params = [rawId]
-    }
-    const [usuarios] = await pool.query<RowDataPacket[]>('SELECT * FROM usuarios WHERE id = ?', params)
-    if (usuarios.length === 0) {
-      return undefined
-    }
-    const usuario = usuarios[0] as Usuario
-    return usuario
+  async findONE(item: { id: number }): Promise<Usuario | null> {
+    return this.em.findOne(Usuario, item.id);
   }
 
-  public async add(usuarioInput: Usuario): Promise<Usuario | undefined> {
-    const {id, ...usuarioRow} = usuarioInput
-    const [result] = await pool.query<ResultSetHeader>('INSERT INTO usuarios set ?', [usuarioRow])
-    usuarioInput.id = result.insertId
-    return usuarioInput
+  async add(usuarioInput: { name: string; esAdmin: boolean; estaActivo: boolean }): Promise<Usuario> {
+    const usuario = this.em.create(Usuario, usuarioInput);
+    await this.em.persist(usuario).flush();
+    return usuario;
   }
 
-  public async update(id: string,usuarioInput: Usuario): Promise<Usuario | undefined> {
-    const usuarioId = Number.parseInt(id)
-    await pool.query('update usuarios set ? where id = ?',[usuarioInput, Number.parseInt(id)] )
-    return await this.findONE({id})
-
+  async update(id: number, usuarioInput: { name?: string; esAdmin?: boolean; estaActivo?: boolean }): Promise<Usuario | null> {
+    const usuario = await this.em.findOne(Usuario, id);
+    if (!usuario) return null;
+    this.em.assign(usuario, usuarioInput);
+    await this.em.flush();
+    return usuario;
   }
 
-
-  public async delete(item: { id: string }): Promise<Usuario | undefined> {  
-    try {
-     const usuarioToDelete = await this.findONE(item)
-     const usuarioId = Number.parseInt(item.id)
-     await pool.query('delete from usuarios where id = ?',[usuarioId])
-     return usuarioToDelete;
-  }  catch (error: any) {
-     throw new Error('unable to delete usuario:')
-   }
+  async delete(item: { id: number }): Promise<Usuario | null> {
+    const usuario = await this.em.findOne(Usuario, item.id);
+    if (!usuario) return null;
+    await this.em.remove(usuario).flush();
+    return usuario;
   }
-
 }
-
-/*const usuarios = [
-  new Usuario(
-    'Alpha',
-    true,
-    true,
-    'cub45-328-777-0000-0000'
-
-  ),
-]
-*/
-  

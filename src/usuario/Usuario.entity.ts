@@ -1,10 +1,17 @@
-import crypto from 'node:crypto'
-export class Usuario {
-  constructor(
-    public name: string,
-    public esAdmin: boolean,
-    public estaActivo: boolean,
-    public id?: string | number
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 
-  ){}
+@Entity()
+export class Usuario {
+
+  @PrimaryKey()
+  id!: number;
+
+  @Property()
+  name!: string;
+
+  @Property()
+  esAdmin!: boolean;
+
+  @Property()
+  estaActivo!: boolean;
 }

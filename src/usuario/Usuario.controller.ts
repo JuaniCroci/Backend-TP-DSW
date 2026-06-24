@@ -1,10 +1,11 @@
-import {Request, Response, NextFunction} from "express"
-import { usuarioRepository } from "./Usuario.repository.js"
-import { Usuario } from "./Usuario.entity.js"
-const repository = new usuarioRepository()
+import { Request, Response, NextFunction } from 'express'
+import { usuarioRepository } from './Usuario.repository.js'
 
-function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
+function getRepo(req: Request): usuarioRepository {
+  return (req as any).usuarioRepo;
+}
 
+function sanitizeUsuarioInput(req: Request, _res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     name: req.body.name,
     esAdmin: req.body.esAdmin,
@@ -15,57 +16,54 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: Function) {
       delete req.body.sanitizedInput[key]
     }
   })
-
-  next() 
-
+  next()
 }
 
 async function findAll(req: Request, res: Response) {
-  res.json({ data: await repository.findAll()})
+  const data = await getRepo(req).findAll();
+  res.json({ data });
 }
 
 async function findONE(req: Request, res: Response) {
-  const id = req.params.id as string
-  const usuario = await repository.findONE({id})
-  if (!usuario) {
-    return res.status(404).send({message: 'Usuario no encontrado'})
+  const id = Number(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).send({ message: 'ID inválido' });
   }
-  res.json({data: usuario})
+  const usuario = await getRepo(req).findONE({ id });
+  if (!usuario) {
+    return res.status(404).send({ message: 'Usuario no encontrado' });
+  }
+  res.json({ data: usuario });
 }
-
 
 async function add(req: Request, res: Response) {
-  const input = req.body.sanitizedInput
-
-  const usuarioInput = new Usuario (input.name, input.esAdmin, input.estaActivo )
-  const usuario = await repository.add(usuarioInput)
-  return res.status(201).send({message: 'Usuario creado', data: usuario})
-
-
+  const input = req.body.sanitizedInput;
+  const usuario = await getRepo(req).add(input);
+  return res.status(201).send({ message: 'Usuario creado', data: usuario });
 }
 
-async function update (req: Request, res: Response) {
-  const id = req.params.id as string
-  const usuario = await repository.update(id, req.body.sanitizedInput as Usuario)
-  
-  if (!usuario) {
-    return res.status(404).send({message: 'Usuario no encontrado'})
+async function update(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).send({ message: 'ID inválido' });
   }
- 
-  return res.status(200).send({message: 'Usuario actualizado correctamente', data: usuario})
+  const usuario = await getRepo(req).update(id, req.body.sanitizedInput);
+  if (!usuario) {
+    return res.status(404).send({ message: 'Usuario no encontrado' });
+  }
+  return res.status(200).send({ message: 'Usuario actualizado', data: usuario });
 }
 
 async function remove(req: Request, res: Response) {
-  const id = req.params.id as string
-  const usuario =await repository.delete({id})
-
-  if (!usuario) {
-    res.status(404).send({message: 'Usuario no encontrado'})
-  } else {
-    res.status(200).send({message: 'Usuario eliminado correctamente'})
+  const id = Number(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).send({ message: 'ID inválido' });
   }
+  const usuario = await getRepo(req).delete({ id });
+  if (!usuario) {
+    return res.status(404).send({ message: 'Usuario no encontrado' });
+  }
+  return res.status(200).send({ message: 'Usuario eliminado correctamente' });
 }
 
-
-export {sanitizeUsuarioInput, findAll, findONE, add, update, remove}
-
+export { sanitizeUsuarioInput, findAll, findONE, add, update, remove }

@@ -1,20 +1,34 @@
 import 'dotenv/config'
-import express, { NextFunction, Request, Response } from 'express'
-import { Usuario} from './usuario/Usuario.entity.js'
-import { usuarioRepository } from './usuario/Usuario.repository.js'
+import express from 'express'
+import { MikroORM } from '@mikro-orm/mysql';
+import config from './mikro-orm.config.js';
 import { usuarioRouter } from './usuario/Usuario.routes.js'
+import { usuarioRepository } from './usuario/Usuario.repository.js';
 
-const app = express()
+async function main() {
+  const orm = await MikroORM.init(config);
+  await orm.migrator.up();
 
-app.use(express.json())
+  const em = orm.em.fork();
+  const repo = new usuarioRepository(em);
 
-app.use('/api/usuarios', usuarioRouter)
+  const app = express();
+  app.use(express.json());
 
-app.use((_, res) => {
-  return res.status(404).send({ message: 'Resource not found' })
-})
+  app.use((req, _res, next) => {
+    (req as any).usuarioRepo = repo;
+    next();
+  });
 
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000' )
-}) 
+  app.use('/api/usuarios', usuarioRouter);
 
+  app.use((_req, res) => {
+    res.status(404).send({ message: 'Resource not found' });
+  });
+
+  app.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+  });
+}
+
+main().catch(console.error);
