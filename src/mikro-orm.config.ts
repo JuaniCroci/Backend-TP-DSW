@@ -1,8 +1,8 @@
-import { defineConfig } from '@mikro-orm/mysql';
+import { defineConfig, Options } from '@mikro-orm/mysql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import 'dotenv/config';
 
-export default defineConfig({
+const config: Options = defineConfig({
   host:     process.env.DB_HOST     || 'localhost',
   port:     Number(process.env.DB_PORT) || 3306,
   dbName:   process.env.DB_NAME     || 'entreno2',
@@ -20,3 +20,5 @@ export default defineConfig({
 
   debug: process.env.NODE_ENV !== 'production',
 });
+
+export default config;
