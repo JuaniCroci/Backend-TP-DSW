@@ -1,34 +1,22 @@
-import 'dotenv/config'
-import express from 'express'
-import { MikroORM } from '@mikro-orm/mysql';
-import config from './mikro-orm.config.js';
-import { usuarioRouter } from './usuario/Usuario.routes.js'
-import { usuarioRepository } from './usuario/Usuario.repository.js';
+import 'reflect-metadata';
+import express from 'express';
+import { orm } from './shared/db/orm.js';
+import { RequestContext } from '@mikro-orm/core';
+import { usuarioRouter } from './usuario/Usuario.routes.js';
 
-async function main() {
-  const orm = await MikroORM.init(config);
-  await orm.migrator.up();
+const app = express();
+app.use(express.json());
 
-  const em = orm.em.fork();
-  const repo = new usuarioRepository(em);
+app.use((req, res, next) => {
+  RequestContext.create(orm.em, next);
+});
 
-  const app = express();
-  app.use(express.json());
+app.use('/api/usuarios', usuarioRouter);
 
-  app.use((req, _res, next) => {
-    (req as any).usuarioRepo = repo;
-    next();
-  });
+app.use((_req, res) => {
+  res.status(404).send({ message: 'Resource not found' });
+});
 
-  app.use('/api/usuarios', usuarioRouter);
-
-  app.use((_req, res) => {
-    res.status(404).send({ message: 'Resource not found' });
-  });
-
-  app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-  });
-}
-
-main().catch(console.error);
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
+});

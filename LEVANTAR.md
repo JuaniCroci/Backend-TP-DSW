@@ -110,6 +110,15 @@ pnpm run migration:up
 npx tsc && node dist/app.js
 ```
 
+> **Nota para Podman:** Si al volver te da error de conexión (`unable to connect to Podman socket`),
+> la VM quedó en un estado inconsistente. Solución:
+> ```powershell
+> podman machine stop
+> podman machine start
+> podman start backend_tp_mysql
+> ```
+> Después ya podés continuar con `node dist/app.js`.
+
 ---
 
 ## Comandos útiles
@@ -176,6 +185,15 @@ Borrar el caché de compilación y recompilar:
 ```powershell
 Remove-Item tsconfig.tsbuildinfo -Force
 npx tsc
+```
+
+### Podman: `unable to connect to Podman socket` después de encender la PC
+**Causa:** La VM de Podman quedó en un estado inconsistente.
+**Solución:**
+```powershell
+podman machine stop
+podman machine start
+podman start backend_tp_mysql
 ```
 
 ### Podman: `exec: "docker-compose": executable file not found`
